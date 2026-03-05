@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dragon Realms</title>
+
+<style>
+
+body{
+background:#0a0a0a;
+color:white;
+text-align:center;
+font-family:sans-serif;
+}
+
+#island{
+width:100%;
+height:320px;
+background:#1a1a1a;
+border-radius:15px;
+margin-top:15px;
+position:relative;
+overflow:hidden;
+}
+
+.dragon{
+position:absolute;
+font-size:35px;
+animation:fly 10s infinite linear;
+}
+
+@keyframes fly{
+0%{left:0px; top:220px;}
+25%{left:120px; top:200px;}
+50%{left:220px; top:240px;}
+75%{left:140px; top:180px;}
+100%{left:0px; top:220px;}
+}
+
+.panel{
+background:#1f1f1f;
+padding:10px;
+margin:10px;
+border-radius:10px;
+}
+
+button{
+padding:12px;
+margin:6px;
+font-size:18px;
+border-radius:10px;
+border:none;
+}
+
+.egg{
+font-size:35px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🐉 Dragon Realms</h1>
+
+<div class="panel">
+💰 Gold: <span id="gold">0</span> |
+🍎 Food: <span id="food">0</span> |
+💎 Gem: <span id="gem">0</span>
+</div>
+
+<div class="panel">
+
+<button onclick="breed()">🧬 Breed</button>
+<button onclick="feed()">🍎 Feed</button>
+<button onclick="battle()">⚔ Battle</button>
+<button onclick="farm()">🌾 Farm</button>
+
+</div>
+
+<div id="island"></div>
+
+<div id="output" class="panel"></div>
+
+<script>
+
+let gold = parseInt(localStorage.getItem("gold")) || 500
+let food = parseInt(localStorage.getItem("food")) || 200
+let gem = parseInt(localStorage.getItem("gem")) || 5
+
+let dragons = JSON.parse(localStorage.getItem("dragons")) || []
+
+function save(){
+
+localStorage.setItem("gold",gold)
+localStorage.setItem("food",food)
+localStorage.setItem("gem",gem)
+localStorage.setItem("dragons",JSON.stringify(dragons))
+
+}
+
+function update(){
+
+document.getElementById("gold").innerText=gold
+document.getElementById("food").innerText=food
+document.getElementById("gem").innerText=gem
+
+}
+
+function output(text){
+
+document.getElementById("output").innerText=text
+
+}
+
+function spawnDragon(){
+
+let d=document.createElement("div")
+
+d.className="dragon"
+
+d.innerHTML="🐉"
+
+d.style.top=Math.random()*250+"px"
+
+document.getElementById("island").appendChild(d)
+
+}
+
+function loadDragons(){
+
+for(let i=0;i<dragons.length;i++){
+
+spawnDragon()
+
+}
+
+}
+
+function breed(){
+
+if(food<50){
+
+output("Ovqat yetarli emas")
+
+return
+
+}
+
+food-=50
+
+let egg=document.createElement("div")
+
+egg.className="egg"
+
+egg.innerHTML="🥚"
+
+document.getElementById("island").appendChild(egg)
+
+output("Tuxum qo'yildi 🥚")
+
+setTimeout(()=>{
+
+egg.remove()
+
+dragons.push({level:1})
+
+spawnDragon()
+
+output("Yangi dragon chiqdi 🐉")
+
+save()
+
+},5000)
+
+update()
+
+save()
+
+}
+
+function feed(){
+
+if(food<20){
+
+output("Ovqat yo'q")
+
+return
+
+}
+
+if(dragons.length==0){
+
+output("Dragon yo'q")
+
+return
+
+}
+
+food-=20
+
+dragons[0].level++
+
+output("Dragon level oshdi 🐉 Lv."+dragons[0].level)
+
+update()
+
+save()
+
+}
+
+function battle(){
+
+if(dragons.length==0){
+
+output("Dragon yo'q")
+
+return
+
+}
+
+let r=Math.random()
+
+if(r>0.5){
+
+gold+=100
+
+output("Jangda yutdingiz ⚔ +100 gold")
+
+}else{
+
+output("Jangda yutqazdingiz")
+
+}
+
+update()
+
+save()
+
+}
+
+function farm(){
+
+food+=50
+
+output("Ferma +50 ovqat berdi 🌾")
+
+update()
+
+save()
+
+}
+
+update()
+
+loadDragons()
+
+</script>
+
+</body>
+</html>
