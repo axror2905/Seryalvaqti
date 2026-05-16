@@ -1,21 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>NevDub Player</title>
+    <title>Kino ko‘rish</title>
 </head>
 
-<body style="background:black;color:white;text-align:center;">
+<body style="background:black;text-align:center;">
 
-<h1>🎬 NevDub</h1>
+<video width="100%" controls controlsList="nodownload">
 
-<video
-width="100%"
-controls
-controlsList="nodownload"
-oncontextmenu="return false;"
->
-
-<source src="{{ url_for('download_file', filename='movie.mp4') }}" type="video/mp4">
+<source src="/downloads/{{ video }}" type="video/mp4">
 
 </video>
 

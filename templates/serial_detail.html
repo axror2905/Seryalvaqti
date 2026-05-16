@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ serial_name }}</title>
+</head>
+
+<body style="background:black;color:white;font-family:sans-serif;">
+
+<h1 style="text-align:center;">{{ serial_name }}</h1>
+
+{% for episode in episodes %}
+
+<a href="{{ episode.link }}" style="text-decoration:none;color:white;display:block;">
+
+<div style="background:#111;padding:15px;border-radius:10px;margin:10px;">
+
+<h3>{{ episode.text }}</h3>
+
+</div>
+
+</a>
+
+{% endfor %}
+
+</body>
+</html>
