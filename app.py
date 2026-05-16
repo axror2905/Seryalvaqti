@@ -20,8 +20,7 @@ client = TelegramClient(
     loop=loop
 )
 
-loop.run_until_complete(client.start())
-
+client.start()
 
 @app.route(f"/{SECRET_PATH}")
 def home():
