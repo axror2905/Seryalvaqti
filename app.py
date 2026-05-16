@@ -73,6 +73,12 @@ def movies():
     for msg in messages:
         if msg.file and msg.file.mime_type:
             if "video" in msg.file.mime_type:
+
+                text = (msg.message or "").lower()
+
+                if "#kino" not in text:
+                    continue
+
                 movies_list.append({
                     "id": msg.id,
                     "title": msg.message or "Kino"
@@ -104,6 +110,12 @@ def serials():
     for msg in messages:
         if msg.file and msg.file.mime_type:
             if "video" in msg.file.mime_type:
+
+                text = (msg.message or "").lower()
+
+                if "#serial" not in text:
+                    continue
+
                 serials_list.append({
                     "id": msg.id,
                     "title": msg.message or "Serial"
@@ -122,7 +134,6 @@ def serials():
         """
 
     return f"<body style='background:#111'>{html}</body>"
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
