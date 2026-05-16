@@ -1,3 +1,7 @@
+import asyncio
+
+asyncio.set_event_loop(asyncio.new_event_loop())
+
 from flask import Flask, render_template, send_from_directory, request
 from telethon.sync import TelegramClient
 import os
