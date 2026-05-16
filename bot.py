@@ -1,4 +1,4 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 TOKEN = "7249392069:AAGCLdFFMBdG3Sbul5xo1t1NpA-Y5rAZYK8"
@@ -21,7 +21,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [
                     InlineKeyboardButton(
                         "🎬 Saytga kirish",
-                        url=f"{WEBSITE}?id={user_id}"
+                        web_app=WebAppInfo(url=WEBSITE)
                     )
                 ]
             ]
