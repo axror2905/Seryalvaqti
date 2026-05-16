@@ -87,6 +87,8 @@ def watch(msg_id):
 
 
 
+from flask import send_file
+
 @app.route("/stream/<int:msg_id>")
 def stream(msg_id):
 
@@ -98,16 +100,10 @@ def stream(msg_id):
         message.download_media(file=f"temp_{msg_id}.mp4")
     )
 
-    def generate():
-        with open(file_path, "rb") as f:
-            while chunk := f.read(1024 * 1024):
-                yield chunk
-
-    return Response(
-        generate(),
+    return send_file(
+        file_path,
         mimetype="video/mp4"
     )
-
 @app.route("/movies")
 def movies():
 
