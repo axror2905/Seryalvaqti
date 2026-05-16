@@ -90,7 +90,7 @@ def movies():
         html += f"""
         <div style='background:#222;padding:15px;margin:10px;border-radius:10px'>
             <a style='color:white;text-decoration:none'
-            href='https://t.me/c/{str(CHANNEL)[4:]}/{movie["id"]}'>
+            href='/watch/{movie["id"]}'>
             {movie["title"]}
             </a>
         </div>
@@ -127,13 +127,34 @@ def serials():
         html += f"""
         <div style='background:#222;padding:15px;margin:10px;border-radius:10px'>
             <a style='color:white;text-decoration:none'
-            href='https://t.me/c/{str(CHANNEL)[4:]}/{serial["id"]}'>
+            href='/watch/{serial["id"]}'>
             {serial["title"]}
             </a>
         </div>
         """
 
     return f"<body style='background:#111'>{html}</body>"
+
+
+@app.route("/watch/<int:msg_id>")
+def watch(msg_id):
+
+    link = f"https://t.me/c/{str(CHANNEL)[4:]}/{msg_id}"
+
+    html = f"""
+    <body style="background:#111;margin:0">
+
+    <iframe
+        src="{link}"
+        width="100%"
+        height="100%"
+        style="border:none;position:fixed;top:0;left:0">
+    </iframe>
+
+    </body>
+    """
+
+    return html"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
