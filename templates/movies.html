@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kinolar</title>
+</head>
+
+<body style="background:black;color:white;font-family:sans-serif;">
+
+<h1 style="text-align:center;">🎬 Kinolar</h1>
+
+{% for movie in movies %}
+
+<div style="background:#111;padding:15px;border-radius:10px;margin:10px;">
+
+<h3>{{ movie.text }}</h3>
+
+<a href="{{ movie.link }}">
+
+<button style="padding:10px 20px;background:red;color:white;border:none;border-radius:10px;">
+▶ Ko‘rish
+</button>
+
+</a>
+
+</div>
+
+{% endfor %}
+
+</body>
+</html>

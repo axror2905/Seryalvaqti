@@ -1,29 +1,47 @@
-import telebot
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, ContextTypes
 
 TOKEN = "7249392069:AAGCLdFFMBdG3Sbul5xo1t1NpA-Y5rAZYK8"
 
-bot = telebot.TeleBot(TOKEN)
+VIP_GROUP = "@newdubtest"
 
-@bot.message_handler(commands=['start'])
-def start(message):
+WEBSITE = "https://nevdun.onrender.com"
 
-    text = """
-🎬 NevDub
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-Saytga kirish uchun pastdagi tugmani bosing.
-"""
+    user_id = update.effective_user.id
 
-    markup = telebot.types.InlineKeyboardMarkup()
+    try:
 
-    button = telebot.types.InlineKeyboardButton(
-        "🎬 Saytga kirish",
-        url="http://127.0.0.1:5000"
-    )
+        member = await context.bot.get_chat_member(VIP_GROUP, user_id)
 
-    markup.add(button)
+        if member.status in ["member", "administrator", "creator"]:
 
-    bot.send_message(message.chat.id, text, reply_markup=markup)
+            keyboard = [
+                [InlineKeyboardButton("🎬 Saytga kirish", url=WEBSITE)]
+            ]
 
-print("Bot ishlayapti 🔥")
+            reply_markup = InlineKeyboardMarkup(keyboard)
 
-bot.infinity_polling()
+            await update.message.reply_text(
+                "✅ Ruxsat berildi",
+                reply_markup=reply_markup
+            )
+
+        else:
+
+            await update.message.reply_text(
+                "❌ Siz VIP guruhda emassiz"
+            )
+
+    except:
+
+        await update.message.reply_text(
+            "❌ Sizda ruxsat yo‘q.\nAdmin bilan bog‘laning."
+        )
+
+app = Application.builder().token(TOKEN).build()
+
+app.add_handler(CommandHandler("start", start))
+
+app.run_polling()
