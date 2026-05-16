@@ -13,10 +13,12 @@ CHANNEL = "@Newdub_vip"
 SECRET_PATH = "axror_secret_2026"
 
 client = TelegramClient("session", api_id, api_hash)
-client.start()
 
-loop = asyncio.new_event_loop()
-asyncio.set_event_loop(loop)
+
+async def start_client():
+    await client.start()
+
+asyncio.run(start_client())
 
 
 @app.route(f"/{SECRET_PATH}")
@@ -24,7 +26,10 @@ def home():
 
     user_id = request.args.get("id")
 
-    return render_template("home.html", user_id=user_id)
+    return render_template(
+        "home.html",
+        user_id=user_id
+    )
 
 
 @app.route("/movies")
@@ -40,20 +45,18 @@ def movies():
 
         for msg in messages:
 
-            if msg.video and msg.text:
+            if msg.video and msg.text and "#kino" in msg.text:
 
-                if "#kino" in msg.text:
+                title = msg.text.split("\n")[0]
 
-                    title = msg.text.split("\n")[0]
-
-                    movie_list.append({
-                        "text": title,
-                        "link": f"/watch/{msg.id}?id={user_id}"
-                    })
+                movie_list.append({
+                    "text": title,
+                    "link": f"/watch/{msg.id}?id={user_id}"
+                })
 
         return movie_list
 
-    movies = loop.run_until_complete(get_movies())
+    movies = asyncio.run(get_movies())
 
     return render_template(
         "movies.html",
@@ -98,7 +101,7 @@ def serials():
 
         return list(serials_dict.values())
 
-    serials = loop.run_until_complete(get_serials())
+    serials = asyncio.run(get_serials())
 
     return render_template(
         "serials.html",
@@ -133,7 +136,7 @@ def serial_detail(serial_name):
 
         return episodes
 
-    episodes = loop.run_until_complete(get_episodes())
+    episodes = asyncio.run(get_episodes())
 
     return render_template(
         "serial_detail.html",
@@ -157,18 +160,24 @@ def watch(msg_id):
 
         return os.path.basename(file_path)
 
-    video = loop.run_until_complete(get_video())
+    video = asyncio.run(get_video())
 
     if not video:
         return "❌ Video topilmadi"
 
-    return render_template("watch.html", video=video)
+    return render_template(
+        "watch.html",
+        video=video
+    )
 
 
 @app.route('/downloads/<path:filename>')
 def download_file(filename):
 
-    return send_from_directory('downloads', filename)
+    return send_from_directory(
+        'downloads',
+        filename
+    )
 
 
 if __name__ == "__main__":
