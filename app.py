@@ -62,111 +62,135 @@ def home():
     """
 
 
-@app.route("/movies")
-def movies():
-    messages = loop.run_until_complete(
-        client.get_messages(CHANNEL, limit=100)
+@app.route("/watch/<int:msg_id>")
+def watch(msg_id):
+
+    html = f"""
+    <html>
+    <head>
+        <title>Player</title>
+    </head>
+
+    <body style="margin:0;background:black;">
+
+    <video width="100%" height="100%" controls autoplay>
+        <source src="/stream/{msg_id}" type="video/mp4">
+    </video>
+
+    </body>
+    </html>
+    """
+
+    return html
+
+
+@app.route("/stream/<int:msg_id>")
+async def stream(msg_id):
+
+    message = await client.get_messages(CHANNEL, ids=msg_id)
+
+    file_path = await message.download_media(
+        file=f"temp_{msg_id}.mp4"
     )
+
+    return send_from_directory(".", file_path)
+
+
+@app.route("/movies")
+async def movies():
+
+    messages = await client.get_messages(CHANNEL, limit=100)
 
     movies_list = []
 
     for msg in messages:
+
         if msg.file and msg.file.mime_type:
+
             if "video" in msg.file.mime_type:
-
-                text = (msg.message or "").lower()
-
-                if "#kino" not in text:
-                    continue
 
                 movies_list.append({
                     "id": msg.id,
                     "title": msg.message or "Kino"
                 })
 
-    html = "<h1 style='color:white'>Kinolar</h1>"
+    html = """
+    <body style='background:#111;color:white;font-family:sans-serif'>
+    <h1>Kinolar</h1>
+    """
 
     for movie in movies_list:
+
         html += f"""
-        <div style='background:#222;padding:15px;margin:10px;border-radius:10px'>
-            <a style='color:white;text-decoration:none'
-            href='/watch/{movie["id"]}'>
-            {movie["title"]}
-            </a>
+
+        <div style="
+        background:#222;
+        padding:15px;
+        margin:10px;
+        border-radius:10px">
+
+        <a
+        style="color:white;text-decoration:none"
+        href="/watch/{movie['id']}">
+
+        {movie['title']}
+
+        </a>
+
         </div>
+
         """
 
-    return f"<body style='background:#111'>{html}</body>"
+    html += "</body>"
+
+    return html
 
 
 @app.route("/serials")
-def serials():
-    messages = loop.run_until_complete(
-        client.get_messages(CHANNEL, limit=100)
-    )
+async def serials():
+
+    messages = await client.get_messages(CHANNEL, limit=100)
 
     serials_list = []
 
     for msg in messages:
+
         if msg.file and msg.file.mime_type:
+
             if "video" in msg.file.mime_type:
-
-                text = (msg.message or "").lower()
-
-                if "#serial" not in text:
-                    continue
 
                 serials_list.append({
                     "id": msg.id,
                     "title": msg.message or "Serial"
                 })
 
-    html = "<h1 style='color:white'>Seriallar</h1>"
-
-    for serial in serials_list:
-        html += f"""
-        <div style='background:#222;padding:15px;margin:10px;border-radius:10px'>
-            <a style='color:white;text-decoration:none'
-            href='/watch/{serial["id"]}'>
-            {serial["title"]}
-            </a>
-        </div>
-        """
-
-    return f"<body style='background:#111'>{html}</body>"
-
-
-@app.route("/watch/<int:msg_id>")
-def watch(msg_id):
-
-    link = f"https://t.me/c/{str(CHANNEL)[4:]}/{msg_id}"
-
-    html = f"""
-    <body style="background:#111;
-                 color:white;
-                 text-align:center;
-                 padding-top:100px;
-                 font-family:sans-serif;">
-
-        <h1>Videoni ochish</h1>
-
-        <a href="{link}"
-           target="_blank"
-           style="
-           background:red;
-           color:white;
-           padding:15px 30px;
-           border-radius:10px;
-           text-decoration:none;
-           font-size:20px;
-           ">
-           ▶ Videoni ko‘rish
-        </a>
-
-    </body>
+    html = """
+    <body style='background:#111;color:white;font-family:sans-serif'>
+    <h1>Seriallar</h1>
     """
 
-    return html
+    for serial in serials_list:
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+        html += f"""
+
+        <div style="
+        background:#222;
+        padding:15px;
+        margin:10px;
+        border-radius:10px">
+
+        <a
+        style="color:white;text-decoration:none"
+        href="/watch/{serial['id']}">
+
+        {serial['title']}
+
+        </a>
+
+        </div>
+
+        """
+
+    html += "</body>"
+
+    return html
