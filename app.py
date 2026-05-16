@@ -11,8 +11,8 @@ CHANNEL = -1003991373252
 
 SECRET_PATH = "axror_secret_2026"
 
-client = TelegramClient(
-    "session",
+client =     "session",TelegramClient(
+    "newsession",
     api_id,
     api_hash,
     sequential_updates=True
