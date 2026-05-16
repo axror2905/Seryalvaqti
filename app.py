@@ -2,6 +2,8 @@ from flask import Flask, render_template, request
 from telethon import TelegramClient
 import asyncio
 
+from flask import Response
+
 app = Flask(__name__)
 
 api_id = 21300715
@@ -84,6 +86,7 @@ def watch(msg_id):
     return html
 
 
+
 @app.route("/stream/<int:msg_id>")
 def stream(msg_id):
 
@@ -95,8 +98,15 @@ def stream(msg_id):
         message.download_media(file=f"temp_{msg_id}.mp4")
     )
 
-    return send_from_directory(".", file_path)
+    def generate():
+        with open(file_path, "rb") as f:
+            while chunk := f.read(1024 * 1024):
+                yield chunk
 
+    return Response(
+        generate(),
+        mimetype="video/mp4"
+    )
 
 @app.route("/movies")
 def movies():
@@ -112,8 +122,11 @@ def movies():
 
     for msg in messages:
 
-        if msg.file and msg.file.mime_type:
-            if "video" in msg.file.mime_type:
+            if msg.file and msg.file.mime_type:
+
+    if "video" in msg.file.mime_type:
+
+        if "#kino" in (msg.message or "").lower():
 
                 html += f"""
                 <div style="
@@ -151,10 +164,12 @@ def serials():
 
             if "video" in msg.file.mime_type:
 
-                serials_list.append({
-                    "id": msg.id,
-                    "title": msg.message or "Serial"
-                })
+                if "#serial" in (msg.message or "").lower():
+
+                    serials_list.append({
+                        "id": msg.id,
+                        "title": msg.message or "Serial"
+                    })
 
     html = """
     <body style='background:#111;color:white;font-family:sans-serif'>
@@ -171,13 +186,11 @@ def serials():
         margin:10px;
         border-radius:10px">
 
-        <a
-        style="color:white;text-decoration:none"
-        href="/watch/{serial['id']}">
+        <h3>{serial['title']}</h3>
 
-        {serial['title']}
-
-        </a>
+        <video width="100%" controls controlsList="nodownload">
+            <source src="/stream/{serial['id']}" type="video/mp4">
+        </video>
 
         </div>
 
