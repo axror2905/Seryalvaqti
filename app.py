@@ -85,71 +85,63 @@ def watch(msg_id):
 
 
 @app.route("/stream/<int:msg_id>")
-async def stream(msg_id):
+def stream(msg_id):
 
-    message = await client.get_messages(CHANNEL, ids=msg_id)
+    message = loop.run_until_complete(
+        client.get_messages(CHANNEL, ids=msg_id)
+    )
 
-    file_path = await message.download_media(
-        file=f"temp_{msg_id}.mp4"
+    file_path = loop.run_until_complete(
+        message.download_media(file=f"temp_{msg_id}.mp4")
     )
 
     return send_from_directory(".", file_path)
 
 
 @app.route("/movies")
-async def movies():
+def movies():
 
-    messages = await client.get_messages(CHANNEL, limit=100)
+    messages = loop.run_until_complete(
+        client.get_messages(CHANNEL, limit=100)
+    )
 
-    movies_list = []
+    html = """
+    <body style="background:#111;color:white">
+    <h1>Kinolar</h1>
+    """
 
     for msg in messages:
 
         if msg.file and msg.file.mime_type:
-
             if "video" in msg.file.mime_type:
 
-                movies_list.append({
-                    "id": msg.id,
-                    "title": msg.message or "Kino"
-                })
+                html += f"""
+                <div style="
+                    background:#222;
+                    padding:15px;
+                    margin:10px;
+                    border-radius:10px;
+                ">
 
-    html = """
-    <body style='background:#111;color:white;font-family:sans-serif'>
-    <h1>Kinolar</h1>
-    """
+                <h3>{msg.message or "Kino"}</h3>
 
-    for movie in movies_list:
+                <video width="100%" controls controlsList="nodownload">
+                    <source src="/stream/{msg.id}" type="video/mp4">
+                </video>
 
-        html += f"""
-
-        <div style="
-        background:#222;
-        padding:15px;
-        margin:10px;
-        border-radius:10px">
-
-        <a
-        style="color:white;text-decoration:none"
-        href="/watch/{movie['id']}">
-
-        {movie['title']}
-
-        </a>
-
-        </div>
-
-        """
+                </div>
+                """
 
     html += "</body>"
 
     return html
 
-
 @app.route("/serials")
-async def serials():
+def serials():
 
-    messages = await client.get_messages(CHANNEL, limit=100)
+    messages = loop.run_until_complete(
+        client.get_messages(CHANNEL, limit=100)
+    )
 
     serials_list = []
 
