@@ -8,7 +8,7 @@ app = Flask(__name__)
 api_id = 21300715
 api_hash = "cb468aebfc14cc75a36ac500bbb59988"
 
-CHANNEL = "Newdub_vip"
+CHANNEL = "@Newdub_vip"
 VIP_GROUP = "@newdubtest"
 
 SECRET_PATH = "axror_secret_2026"
