@@ -1,5 +1,5 @@
 from flask import Flask, render_template, send_from_directory, request
-from telethon.sync import TelegramClient
+from telethon import TelegramClient
 import os
 
 app = Flask(__name__)
