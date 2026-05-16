@@ -5,7 +5,7 @@ TOKEN = "7249392069:AAGCLdFFMBdG3Sbul5xo1t1NpA-Y5rAZYK8"
 
 VIP_GROUP = "@newdubtest"
 
-WEBSITE = "https://nevdun.onrender.com"
+WEBSITE = "https://nevdun.onrender.com/axror_secret_2026"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -18,7 +18,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if member.status in ["member", "administrator", "creator"]:
 
             keyboard = [
-                [InlineKeyboardButton("🎬 Saytga kirish", url=WEBSITE)]
+                [
+                    InlineKeyboardButton(
+                        "🎬 Saytga kirish",
+                        url=f"{WEBSITE}?id={user_id}"
+                    )
+                ]
             ]
 
             reply_markup = InlineKeyboardMarkup(keyboard)

@@ -1,10 +1,17 @@
-from flask import Flask, render_template, send_from_directory
-
+from flask import Flask, render_template, send_from_directory, request
 app = Flask(__name__)
 
-@app.route("/")
+SECRET_PATH = "axror_secret_2026"
+
+ALLOWED_USERS = [
+    21300715
+]
 def login():
     return render_template("index.html")
+
+@app.route(f"/{SECRET_PATH}")
+def home_page():
+    return render_template("home.html")
 
 @app.route("/home")
 def home():
