@@ -1,28 +1,38 @@
-from flask import Flask, render_template, send_from_directory, request, redirect
+from flask import Flask, render_template, send_from_directory, request, redirect, session
 
 app = Flask(__name__)
+
+app.secret_key = "nevdub_secret_key"
 
 SECRET_PATH = "axror_secret_2026"
 
 ALLOWED_USERS = [
-    21300715
+    6149468647
 ]
+
+def is_logged_in():
+
+    return session.get("user_id") in ALLOWED_USERS
+
 def login():
     return render_template("index.html")
 
 
 @app.route("/auth")
 def auth():
-
     user_id = request.args.get("id")
 
     if not user_id:
-        return "❌ Telegram login xato"
+        return "❌ Login xato"
 
-    if int(user_id) not in ALLOWED_USERS:
-        return "❌ Siz VIP emassiz"
+    user_id = int(user_id)
 
-    return redirect(f"/movies?id={user_id}")
+    if user_id not in ALLOWED_USERS:
+        return "❌ VIP emas"
+
+    session["user_id"] = user_id
+
+    return redirect("/movies")
 
 @app.route(f"/{SECRET_PATH}")
 def home_page():
@@ -38,13 +48,20 @@ def subscription():
 
 @app.route("/watch/<int:msg_id>")
 def watch(msg_id):
+    if not is_logged_in():
+        return "❌ Ruxsat yo‘q"
 
     video = "downloads/movie.mp4"
 
     return render_template("watch.html", video=video)
 
 @app.route("/movies")
+
+@app.route("/movies")
 def movies():
+
+    if not is_logged_in():
+        return "❌ Ruxsat yo‘q"
 
     movies = [
         {
@@ -52,6 +69,8 @@ def movies():
             "link": "/watch/1"
         }
     ]
+
+    return render_template("movies.html", movies=movies)
 
     return render_template("movies.html", movies=movies)
 
