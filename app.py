@@ -12,10 +12,10 @@ VIP_GROUP = "@newdubtest"
 SECRET_PATH = "axror_secret_2026"
 
 client = TelegramClient("session", api_id, api_hash)
+client.start()
 
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
-loop.run_until_complete(client.start())
 
 @app.route(f"/{SECRET_PATH}")
 def home():
