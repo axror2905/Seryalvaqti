@@ -149,6 +149,7 @@ def movies():
 
     return html
 
+
 @app.route("/serials")
 def serials():
 
