@@ -1,6 +1,5 @@
 from flask import Flask, render_template, send_from_directory, request
-from telethon import TelegramClient
-import asyncio
+from telethon.sync import TelegramClient
 import os
 
 app = Flask(__name__)
@@ -12,13 +11,14 @@ CHANNEL = "@Newdub_vip"
 
 SECRET_PATH = "axror_secret_2026"
 
-client = TelegramClient("session", api_id, api_hash)
+client = TelegramClient(
+    "session",
+    api_id,
+    api_hash,
+    sequential_updates=True
+)
 
-
-async def start_client():
-    await client.start()
-
-asyncio.run(start_client())
+client.start()
 
 
 @app.route(f"/{SECRET_PATH}")
@@ -37,15 +37,15 @@ def movies():
 
     user_id = request.args.get("id")
 
-    async def get_movies():
+    messages = client.get_messages(CHANNEL, limit=100)
 
-        messages = await client.get_messages(CHANNEL, limit=100)
+    movie_list = []
 
-        movie_list = []
+    for msg in messages:
 
-        for msg in messages:
+        if msg.video and msg.text:
 
-            if msg.video and msg.text and "#kino" in msg.text:
+            if "#kino" in msg.text:
 
                 title = msg.text.split("\n")[0]
 
@@ -54,13 +54,9 @@ def movies():
                     "link": f"/watch/{msg.id}?id={user_id}"
                 })
 
-        return movie_list
-
-    movies = asyncio.run(get_movies())
-
     return render_template(
         "movies.html",
-        movies=movies,
+        movies=movie_list,
         user_id=user_id
     )
 
@@ -70,42 +66,36 @@ def serials():
 
     user_id = request.args.get("id")
 
-    async def get_serials():
+    messages = client.get_messages(CHANNEL, limit=100)
 
-        messages = await client.get_messages(CHANNEL, limit=100)
+    serials_dict = {}
 
-        serials_dict = {}
+    for msg in messages:
 
-        for msg in messages:
+        if msg.text and "#serial" in msg.text:
 
-            if msg.text and "#serial" in msg.text:
+            words = msg.text.split()
 
-                words = msg.text.split()
+            tag = None
 
-                tag = None
+            for word in words:
 
-                for word in words:
+                if word.startswith("#") and word != "#serial":
 
-                    if word.startswith("#") and word != "#serial":
+                    tag = word.replace("#", "")
 
-                        tag = word.replace("#", "")
+                    break
 
-                        break
+            if tag:
 
-                if tag:
-
-                    serials_dict[tag] = {
-                        "name": tag.replace("_", " ").title(),
-                        "link": f"/serial/{tag}?id={user_id}"
-                    }
-
-        return list(serials_dict.values())
-
-    serials = asyncio.run(get_serials())
+                serials_dict[tag] = {
+                    "name": tag.replace("_", " ").title(),
+                    "link": f"/serial/{tag}?id={user_id}"
+                }
 
     return render_template(
         "serials.html",
-        serials=serials,
+        serials=list(serials_dict.values()),
         user_id=user_id
     )
 
@@ -115,28 +105,22 @@ def serial_detail(serial_name):
 
     user_id = request.args.get("id")
 
-    async def get_episodes():
+    messages = client.get_messages(CHANNEL, limit=100)
 
-        messages = await client.get_messages(CHANNEL, limit=100)
+    episodes = []
 
-        episodes = []
+    for msg in messages:
 
-        for msg in messages:
+        if msg.video and msg.text:
 
-            if msg.video and msg.text:
+            if f"#{serial_name}" in msg.text:
 
-                if f"#{serial_name}" in msg.text:
+                title = msg.text.split("\n")[0]
 
-                    title = msg.text.split("\n")[0]
-
-                    episodes.append({
-                        "text": title,
-                        "link": f"/watch/{msg.id}?id={user_id}"
-                    })
-
-        return episodes
-
-    episodes = asyncio.run(get_episodes())
+                episodes.append({
+                    "text": title,
+                    "link": f"/watch/{msg.id}?id={user_id}"
+                })
 
     return render_template(
         "serial_detail.html",
@@ -149,21 +133,14 @@ def serial_detail(serial_name):
 @app.route("/watch/<int:msg_id>")
 def watch(msg_id):
 
-    async def get_video():
+    msg = client.get_messages(CHANNEL, ids=msg_id)
 
-        msg = await client.get_messages(CHANNEL, ids=msg_id)
-
-        if not msg:
-            return None
-
-        file_path = await msg.download_media(file="downloads/")
-
-        return os.path.basename(file_path)
-
-    video = asyncio.run(get_video())
-
-    if not video:
+    if not msg:
         return "❌ Video topilmadi"
+
+    file_path = msg.download_media(file="downloads/")
+
+    video = os.path.basename(file_path)
 
     return render_template(
         "watch.html",
