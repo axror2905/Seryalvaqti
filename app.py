@@ -1,164 +1,128 @@
+from flask import Flask, render_template, request
+from telethon import TelegramClient
 import asyncio
-
-asyncio.set_event_loop(asyncio.new_event_loop())
-
-from flask import Flask, render_template, send_from_directory, request
-from telethon.sync import TelegramClient
-import os
 
 app = Flask(__name__)
 
 api_id = 21300715
 api_hash = "cb468aebfc14cc75a36ac500bbb59988"
 
-CHANNEL = "@Newdub_vip"
-
+CHANNEL = -1003991373252
 SECRET_PATH = "axror_secret_2026"
+
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 
 client = TelegramClient(
     "newsession",
     api_id,
-    api_hash
-).start()
+    api_hash,
+    loop=loop
+)
+
+loop.run_until_complete(client.start())
 
 
 @app.route(f"/{SECRET_PATH}")
 def home():
-
     user_id = request.args.get("id")
 
-    return render_template(
-        "home.html",
-        user_id=user_id
-    )
+    return f"""
+    <html>
+    <head>
+        <title>NevDub</title>
+    </head>
+    <body style="background:#111;color:white;text-align:center;padding-top:100px;font-family:sans-serif;">
+        <h1>NevDub</h1>
+
+        <a href="/movies" style="
+            display:block;
+            width:200px;
+            margin:20px auto;
+            padding:15px;
+            background:red;
+            color:white;
+            text-decoration:none;
+            border-radius:10px;
+        ">Kinolar</a>
+
+        <a href="/serials" style="
+            display:block;
+            width:200px;
+            margin:20px auto;
+            padding:15px;
+            background:blue;
+            color:white;
+            text-decoration:none;
+            border-radius:10px;
+        ">Seriallar</a>
+
+        <p>ID: {user_id}</p>
+    </body>
+    </html>
+    """
 
 
 @app.route("/movies")
 def movies():
+    messages = loop.run_until_complete(
+        client.get_messages(CHANNEL, limit=100)
+    )
 
-    user_id = request.args.get("id")
-
-    messages = client.get_messages(CHANNEL, limit=100)
-
-    movie_list = []
+    movies_list = []
 
     for msg in messages:
-
-        if msg.video and msg.text:
-
-            if "#kino" in msg.text:
-
-                title = msg.text.split("\n")[0]
-
-                movie_list.append({
-                    "text": title,
-                    "link": f"/watch/{msg.id}?id={user_id}"
+        if msg.file and msg.file.mime_type:
+            if "video" in msg.file.mime_type:
+                movies_list.append({
+                    "id": msg.id,
+                    "title": msg.message or "Kino"
                 })
 
-    return render_template(
-        "movies.html",
-        movies=movie_list,
-        user_id=user_id
-    )
+    html = "<h1 style='color:white'>Kinolar</h1>"
+
+    for movie in movies_list:
+        html += f"""
+        <div style='background:#222;padding:15px;margin:10px;border-radius:10px'>
+            <a style='color:white;text-decoration:none'
+            href='https://t.me/c/{str(CHANNEL)[4:]}/{movie["id"]}'>
+            {movie["title"]}
+            </a>
+        </div>
+        """
+
+    return f"<body style='background:#111'>{html}</body>"
 
 
 @app.route("/serials")
 def serials():
-
-    user_id = request.args.get("id")
-
-    messages = client.get_messages(CHANNEL, limit=100)
-
-    serials_dict = {}
-
-    for msg in messages:
-
-        if msg.text and "#serial" in msg.text:
-
-            words = msg.text.split()
-
-            tag = None
-
-            for word in words:
-
-                if word.startswith("#") and word != "#serial":
-
-                    tag = word.replace("#", "")
-
-                    break
-
-            if tag:
-
-                serials_dict[tag] = {
-                    "name": tag.replace("_", " ").title(),
-                    "link": f"/serial/{tag}?id={user_id}"
-                }
-
-    return render_template(
-        "serials.html",
-        serials=list(serials_dict.values()),
-        user_id=user_id
+    messages = loop.run_until_complete(
+        client.get_messages(CHANNEL, limit=100)
     )
 
-
-@app.route("/serial/<serial_name>")
-def serial_detail(serial_name):
-
-    user_id = request.args.get("id")
-
-    messages = client.get_messages(CHANNEL, limit=100)
-
-    episodes = []
+    serials_list = []
 
     for msg in messages:
-
-        if msg.video and msg.text:
-
-            if f"#{serial_name}" in msg.text:
-
-                title = msg.text.split("\n")[0]
-
-                episodes.append({
-                    "text": title,
-                    "link": f"/watch/{msg.id}?id={user_id}"
+        if msg.file and msg.file.mime_type:
+            if "video" in msg.file.mime_type:
+                serials_list.append({
+                    "id": msg.id,
+                    "title": msg.message or "Serial"
                 })
 
-    return render_template(
-        "serial_detail.html",
-        episodes=episodes,
-        serial_name=serial_name.replace("_", " ").title(),
-        user_id=user_id
-    )
+    html = "<h1 style='color:white'>Seriallar</h1>"
 
+    for serial in serials_list:
+        html += f"""
+        <div style='background:#222;padding:15px;margin:10px;border-radius:10px'>
+            <a style='color:white;text-decoration:none'
+            href='https://t.me/c/{str(CHANNEL)[4:]}/{serial["id"]}'>
+            {serial["title"]}
+            </a>
+        </div>
+        """
 
-@app.route("/watch/<int:msg_id>")
-def watch(msg_id):
-
-    msg = client.get_messages(CHANNEL, ids=msg_id)
-
-    if not msg:
-        return "❌ Video topilmadi"
-
-    file_path = client.download_media(
-        msg,
-        file="downloads/"
-    )
-
-    video = os.path.basename(file_path)
-
-    return render_template(
-        "watch.html",
-        video=video
-    )
-
-
-@app.route('/downloads/<path:filename>')
-def download_file(filename):
-
-    return send_from_directory(
-        'downloads',
-        filename
-    )
+    return f"<body style='background:#111'>{html}</body>"
 
 
 if __name__ == "__main__":
