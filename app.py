@@ -14,8 +14,7 @@ SECRET_PATH = "axror_secret_2026"
 client = TelegramClient(
     "newsession",
     api_id,
-    api_hash,
-    sequential_updates=True
+    api_hash
 )
 
 client.start()
@@ -37,7 +36,9 @@ def movies():
 
     user_id = request.args.get("id")
 
-    messages = client.get_messages(CHANNEL, limit=100)
+    messages = client.loop.run_until_complete(
+        client.get_messages(CHANNEL, limit=100)
+    )
 
     movie_list = []
 
@@ -66,7 +67,9 @@ def serials():
 
     user_id = request.args.get("id")
 
-    messages = client.get_messages(CHANNEL, limit=100)
+    messages = client.loop.run_until_complete(
+        client.get_messages(CHANNEL, limit=100)
+    )
 
     serials_dict = {}
 
@@ -105,7 +108,9 @@ def serial_detail(serial_name):
 
     user_id = request.args.get("id")
 
-    messages = client.get_messages(CHANNEL, limit=100)
+    messages = client.loop.run_until_complete(
+        client.get_messages(CHANNEL, limit=100)
+    )
 
     episodes = []
 
@@ -133,7 +138,9 @@ def serial_detail(serial_name):
 @app.route("/watch/<int:msg_id>")
 def watch(msg_id):
 
-    msg = client.get_messages(CHANNEL, ids=msg_id)
+    msg = client.loop.run_until_complete(
+        client.get_messages(CHANNEL, ids=msg_id)
+    )
 
     if not msg:
         return "❌ Video topilmadi"
