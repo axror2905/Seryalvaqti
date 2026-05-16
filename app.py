@@ -1,4 +1,5 @@
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, render_template, send_from_directory, request, redirect
+
 app = Flask(__name__)
 
 SECRET_PATH = "axror_secret_2026"
@@ -8,6 +9,20 @@ ALLOWED_USERS = [
 ]
 def login():
     return render_template("index.html")
+
+
+@app.route("/auth")
+def auth():
+
+    user_id = request.args.get("id")
+
+    if not user_id:
+        return "❌ Telegram login xato"
+
+    if int(user_id) not in ALLOWED_USERS:
+        return "❌ Siz VIP emassiz"
+
+    return redirect(f"/movies?id={user_id}")
 
 @app.route(f"/{SECRET_PATH}")
 def home_page():
