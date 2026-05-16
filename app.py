@@ -1,5 +1,5 @@
 from flask import Flask, render_template, send_from_directory, request
-from telethon import TelegramClient
+from telethon.sync import TelegramClient
 import os
 
 app = Flask(__name__)
@@ -15,9 +15,7 @@ client = TelegramClient(
     "newsession",
     api_id,
     api_hash
-)
-
-client.start()
+).start()
 
 
 @app.route(f"/{SECRET_PATH}")
@@ -36,9 +34,7 @@ def movies():
 
     user_id = request.args.get("id")
 
-    messages = client.loop.run_until_complete(
-        client.get_messages(CHANNEL, limit=100)
-    )
+    messages = client.get_messages(CHANNEL, limit=100)
 
     movie_list = []
 
@@ -67,9 +63,7 @@ def serials():
 
     user_id = request.args.get("id")
 
-    messages = client.loop.run_until_complete(
-        client.get_messages(CHANNEL, limit=100)
-    )
+    messages = client.get_messages(CHANNEL, limit=100)
 
     serials_dict = {}
 
@@ -108,9 +102,7 @@ def serial_detail(serial_name):
 
     user_id = request.args.get("id")
 
-    messages = client.loop.run_until_complete(
-        client.get_messages(CHANNEL, limit=100)
-    )
+    messages = client.get_messages(CHANNEL, limit=100)
 
     episodes = []
 
@@ -138,14 +130,15 @@ def serial_detail(serial_name):
 @app.route("/watch/<int:msg_id>")
 def watch(msg_id):
 
-    msg = client.loop.run_until_complete(
-        client.get_messages(CHANNEL, ids=msg_id)
-    )
+    msg = client.get_messages(CHANNEL, ids=msg_id)
 
     if not msg:
         return "❌ Video topilmadi"
 
-    file_path = msg.download_media(file="downloads/")
+    file_path = client.download_media(
+        msg,
+        file="downloads/"
+    )
 
     video = os.path.basename(file_path)
 
