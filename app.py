@@ -142,14 +142,26 @@ def watch(msg_id):
     link = f"https://t.me/c/{str(CHANNEL)[4:]}/{msg_id}"
 
     html = f"""
-    <body style="background:#111;margin:0">
+    <body style="background:#111;
+                 color:white;
+                 text-align:center;
+                 padding-top:100px;
+                 font-family:sans-serif;">
 
-    <iframe
-        src="{link}"
-        width="100%"
-        height="100%"
-        style="border:none;position:fixed;top:0;left:0">
-    </iframe>
+        <h1>Videoni ochish</h1>
+
+        <a href="{link}"
+           target="_blank"
+           style="
+           background:red;
+           color:white;
+           padding:15px 30px;
+           border-radius:10px;
+           text-decoration:none;
+           font-size:20px;
+           ">
+           ▶ Videoni ko‘rish
+        </a>
 
     </body>
     """
