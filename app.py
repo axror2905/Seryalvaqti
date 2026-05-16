@@ -17,6 +17,14 @@ client.start()
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
+async def check_user(user_id):
+    try:
+        member = await client.get_permissions(VIP_GROUP, user_id)
+        return member is not None
+    except:
+        return False
+
+
 @app.route(f"/{SECRET_PATH}")
 def home():
 
@@ -27,14 +35,7 @@ def home():
 
     user_id = int(user_id)
 
-    async def check_user():
-        try:
-            member = await client.get_permissions(VIP_GROUP, user_id)
-            return member is not None
-        except:
-            return False
-
-    allowed = loop.run_until_complete(check_user())
+    allowed = loop.run_until_complete(check_user(user_id))
 
     if not allowed:
         return "❌ VIP guruhda emassiz"
@@ -49,6 +50,13 @@ def movies():
 
     if not user_id:
         return "❌ Ruxsat yo‘q"
+
+    user_id = int(user_id)
+
+    allowed = loop.run_until_complete(check_user(user_id))
+
+    if not allowed:
+        return "❌ VIP guruhda emassiz"
 
     movies = [
         {
@@ -68,6 +76,13 @@ def watch(msg_id):
     if not user_id:
         return "❌ Ruxsat yo‘q"
 
+    user_id = int(user_id)
+
+    allowed = loop.run_until_complete(check_user(user_id))
+
+    if not allowed:
+        return "❌ VIP guruhda emassiz"
+
     video = "downloads/movie.mp4"
 
     return render_template("watch.html", video=video)
@@ -76,6 +91,7 @@ def watch(msg_id):
 @app.route('/downloads/<path:filename>')
 def download_file(filename):
     return send_from_directory('downloads', filename)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
