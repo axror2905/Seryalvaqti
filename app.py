@@ -46,10 +46,6 @@ def auth():
 
 @app.route(f"/{SECRET_PATH}")
 def home_page():
-
-    if not is_logged_in():
-        return redirect("/auth?id=6149468647")
-
     return render_template("home.html")
 
 @app.route("/movies")
