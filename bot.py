@@ -21,7 +21,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 [
                     InlineKeyboardButton(
                         "🎬 Saytga kirish",
-                        web_app=WebAppInfo(url=WEBSITE)
+                         web_app=WebAppInfo(url=f"{WEBSITE}?id={user_id}")
                     )
                 ]
             ]
