@@ -7,7 +7,7 @@ app = Flask(__name__)
 api_id = 21300715
 api_hash = "cb468aebfc14cc75a36ac500bbb59988"
 
-CHANNEL = -1003991373252
+CHANNEL = 3991373252
 SECRET_PATH = "axror_secret_2026"
 
 loop = asyncio.new_event_loop()
@@ -21,6 +21,9 @@ client = TelegramClient(
 )
 
 loop.run_until_complete(client.connect())
+entity = loop.run_until_complete(
+    client.get_entity(CHANNEL)
+)
 
 @app.route(f"/{SECRET_PATH}")
 def home():
@@ -99,7 +102,7 @@ async def stream(msg_id):
 @app.route("/movies")
 async def movies():
 
-    messages = await client.get_messages(CHANNEL, limit=100)
+    messages = await client.get_messages(entity, limit=100)
 
     movies_list = []
 
