@@ -122,33 +122,32 @@ def movies():
 
     for msg in messages:
 
-            if msg.file and msg.file.mime_type:
+        if msg.file and msg.file.mime_type:
 
-    if "video" in msg.file.mime_type:
+            if "video" in msg.file.mime_type:
 
-        if "#kino" in (msg.message or "").lower():
+                if "#kino" in (msg.message or "").lower():
 
-                html += f"""
-                <div style="
-                    background:#222;
-                    padding:15px;
-                    margin:10px;
-                    border-radius:10px;
-                ">
+                    html += f"""
+                    <div style="
+                        background:#222;
+                        padding:15px;
+                        margin:10px;
+                        border-radius:10px;
+                    ">
 
-                <h3>{msg.message or "Kino"}</h3>
+                    <h3>{msg.message or "Kino"}</h3>
 
-                <video width="100%" controls controlsList="nodownload">
-                    <source src="/stream/{msg.id}" type="video/mp4">
-                </video>
+                    <video width="100%" controls controlsList="nodownload">
+                        <source src="/stream/{msg.id}" type="video/mp4">
+                    </video>
 
-                </div>
-                """
+                    </div>
+                    """
 
     html += "</body>"
 
     return html
-
 
 @app.route("/serials")
 def serials():
