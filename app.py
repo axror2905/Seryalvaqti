@@ -4,6 +4,8 @@ import asyncio
 from flask import send_file
 import os
 
+from flask import Response
+
 app = Flask(__name__)
 
 api_id = 21300715
@@ -85,7 +87,6 @@ def watch(msg_id):
 
     return html
 
-
 @app.route("/stream/<int:msg_id>")
 def stream(msg_id):
 
@@ -94,13 +95,14 @@ def stream(msg_id):
     )
 
     file_path = loop.run_until_complete(
-        message.download_media(file=f"video_{msg_id}.mp4")
+        message.download_media(file=bytes)
     )
 
-    return send_file(
+    return Response(
         file_path,
         mimetype="video/mp4"
     )
+
 
 @app.route("/movies")
 def movies():
