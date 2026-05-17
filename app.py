@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request
 from telethon import TelegramClient
 import asyncio
-
-from flask import Response
+from flask import send_file
+import os
 
 app = Flask(__name__)
 
@@ -86,9 +86,6 @@ def watch(msg_id):
     return html
 
 
-
-from flask import send_file
-
 @app.route("/stream/<int:msg_id>")
 def stream(msg_id):
 
@@ -100,10 +97,14 @@ def stream(msg_id):
         message.download_media(file=f"temp_{msg_id}.mp4")
     )
 
+    absolute_path = os.path.abspath(file_path)
+
     return send_file(
-        file_path,
-        mimetype="video/mp4"
+        absolute_path,
+        mimetype="video/mp4",
+        conditional=True
     )
+
 @app.route("/movies")
 def movies():
 
