@@ -134,7 +134,14 @@ def movies():
 
                     <h3>{msg.message or "Kino"}</h3>
 
-                    <video width="100%" controls controlsList="nodownload">
+                    <video
+                        width="100%"
+                        controls
+                        controlsList="nodownload"
+                        preload="metadata"
+                        playsinline
+                        style="border-radius:10px"
+                    >
                         <source src="/stream/{msg.id}" type="video/mp4">
                     </video>
 
@@ -183,10 +190,16 @@ def serials():
         border-radius:10px">
 
         <h3>{serial['title']}</h3>
-
-        <video width="100%" controls controlsList="nodownload">
-            <source src="/stream/{serial['id']}" type="video/mp4">
-        </video>
+        <video
+        width="100%"
+        controls
+        controlsList="nodownload"
+        preload="metadata"
+        playsinline
+        style="border-radius:10px"
+   >
+       <source src="/stream/{serial['id']}" type="video/mp4">
+       </video>
 
         </div>
 
