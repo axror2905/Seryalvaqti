@@ -94,15 +94,12 @@ def stream(msg_id):
     )
 
     file_path = loop.run_until_complete(
-        message.download_media(file=f"temp_{msg_id}.mp4")
+        message.download_media(file=f"video_{msg_id}.mp4")
     )
 
-    absolute_path = os.path.abspath(file_path)
-
     return send_file(
-        absolute_path,
-        mimetype="video/mp4",
-        conditional=True
+        file_path,
+        mimetype="video/mp4"
     )
 
 @app.route("/movies")
@@ -138,9 +135,9 @@ def movies():
                     <video
                         width="100%"
                         controls
-                        controlsList="nodownload"
-                        preload="metadata"
+                        autoplay
                         playsinline
+                        preload="auto"
                         style="border-radius:10px"
                     >
                         <source src="/stream/{msg.id}" type="video/mp4">
@@ -152,6 +149,7 @@ def movies():
     html += "</body>"
 
     return html
+
 
 @app.route("/serials")
 def serials():
@@ -191,16 +189,17 @@ def serials():
         border-radius:10px">
 
         <h3>{serial['title']}</h3>
+
         <video
-        width="100%"
-        controls
-        controlsList="nodownload"
-        preload="metadata"
-        playsinline
-        style="border-radius:10px"
-   >
-       <source src="/stream/{serial['id']}" type="video/mp4">
-       </video>
+            width="100%"
+            controls
+            autoplay
+            playsinline
+            preload="auto"
+            style="border-radius:10px"
+        >
+            <source src="/stream/{serial['id']}" type="video/mp4">
+        </video>
 
         </div>
 
