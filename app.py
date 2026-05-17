@@ -1,10 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, request, send_file
 from telethon import TelegramClient
 import asyncio
-from flask import send_file
 import os
-
-from flask import Response
 
 app = Flask(__name__)
 
@@ -20,72 +17,71 @@ asyncio.set_event_loop(loop)
 client = TelegramClient(
     "newsession",
     api_id,
-    api_hash,
-    loop=loop
+    api_hash
 )
 
 loop.run_until_complete(client.connect())
 
+
 @app.route(f"/{SECRET_PATH}")
 def home():
+
     user_id = request.args.get("id")
 
     return f"""
     <html>
+
     <head>
+        <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
         <title>NevDub</title>
     </head>
-    <body style="background:#111;color:white;text-align:center;padding-top:100px;font-family:sans-serif;">
+
+    <body style="
+        background:#111;
+        color:white;
+        text-align:center;
+        padding-top:100px;
+        font-family:sans-serif;
+    ">
+
         <h1>NevDub</h1>
 
         <a href="/movies" style="
             display:block;
-            width:200px;
+            width:220px;
             margin:20px auto;
             padding:15px;
             background:red;
             color:white;
             text-decoration:none;
             border-radius:10px;
-        ">Kinolar</a>
+            font-size:20px;
+        ">
+            🎬 Kinolar
+        </a>
 
         <a href="/serials" style="
             display:block;
-            width:200px;
+            width:220px;
             margin:20px auto;
             padding:15px;
             background:blue;
             color:white;
             text-decoration:none;
             border-radius:10px;
-        ">Seriallar</a>
+            font-size:20px;
+        ">
+            📺 Seriallar
+        </a>
 
         <p>ID: {user_id}</p>
-    </body>
-    </html>
-    """
-
-
-@app.route("/watch/<int:msg_id>")
-def watch(msg_id):
-
-    html = f"""
-    <html>
-    <head>
-        <title>Player</title>
-    </head>
-
-    <body style="margin:0;background:black;">
-
-    <video width="100%" height="100%" controls autoplay>
-        <source src="/stream/{msg_id}" type="video/mp4">
-    </video>
 
     </body>
     </html>
     """
 
-    return html
 
 @app.route("/stream/<int:msg_id>")
 def stream(msg_id):
@@ -95,12 +91,15 @@ def stream(msg_id):
     )
 
     file_path = loop.run_until_complete(
-        message.download_media(file=bytes)
+        message.download_media(file=f"temp_{msg_id}.mp4")
     )
 
-    return Response(
-        file_path,
-        mimetype="video/mp4"
+    absolute_path = os.path.abspath(file_path)
+
+    return send_file(
+        absolute_path,
+        mimetype="video/mp4",
+        conditional=True
     )
 
 
@@ -260,3 +259,7 @@ def serials():
     html += "</body></html>"
 
     return html
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
