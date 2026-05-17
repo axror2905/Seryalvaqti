@@ -112,8 +112,24 @@ def movies():
     )
 
     html = """
-    <body style="background:#111;color:white">
-    <h1>Kinolar</h1>
+    <html>
+
+    <head>
+        <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+        <title>NevDub Kinolar</title>
+    </head>
+
+    <body style="
+        background:#111;
+        color:white;
+        font-family:sans-serif;
+        margin:0;
+        padding:10px;
+    ">
+
+    <h1 style="text-align:center">Kinolar</h1>
     """
 
     for msg in messages:
@@ -125,30 +141,41 @@ def movies():
                 if "#kino" in (msg.message or "").lower():
 
                     html += f"""
+
                     <div style="
                         background:#222;
                         padding:15px;
-                        margin:10px;
-                        border-radius:10px;
+                        margin-bottom:20px;
+                        border-radius:15px;
                     ">
 
-                    <h3>{msg.message or "Kino"}</h3>
+                    <h3 style="
+                        margin-bottom:10px;
+                    ">
+                        {msg.message or "Kino"}
+                    </h3>
 
                     <video
                         width="100%"
                         controls
-                        autoplay
                         playsinline
                         preload="auto"
-                        style="border-radius:10px"
+                        controlsList="nodownload"
+                        style="
+                            border-radius:12px;
+                            background:black;
+                            max-height:80vh;
+                        "
                     >
-                        <source src="/stream/{msg.id}" type="video/mp4">
+                        <source
+                        src="/stream/{msg.id}"
+                        type="video/mp4">
                     </video>
 
                     </div>
                     """
 
-    html += "</body>"
+    html += "</body></html>"
 
     return html
 
@@ -160,7 +187,26 @@ def serials():
         client.get_messages(CHANNEL, limit=100)
     )
 
-    serials_list = []
+    html = """
+    <html>
+
+    <head>
+        <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+        <title>NevDub Seriallar</title>
+    </head>
+
+    <body style="
+        background:#111;
+        color:white;
+        font-family:sans-serif;
+        margin:0;
+        padding:10px;
+    ">
+
+    <h1 style="text-align:center">Seriallar</h1>
+    """
 
     for msg in messages:
 
@@ -170,43 +216,41 @@ def serials():
 
                 if "#serial" in (msg.message or "").lower():
 
-                    serials_list.append({
-                        "id": msg.id,
-                        "title": msg.message or "Serial"
-                    })
+                    html += f"""
 
-    html = """
-    <body style='background:#111;color:white;font-family:sans-serif'>
-    <h1>Seriallar</h1>
-    """
+                    <div style="
+                        background:#222;
+                        padding:15px;
+                        margin-bottom:20px;
+                        border-radius:15px;
+                    ">
 
-    for serial in serials_list:
+                    <h3 style="
+                        margin-bottom:10px;
+                    ">
+                        {msg.message or "Serial"}
+                    </h3>
 
-        html += f"""
+                    <video
+                        width="100%"
+                        controls
+                        playsinline
+                        preload="auto"
+                        controlsList="nodownload"
+                        style="
+                            border-radius:12px;
+                            background:black;
+                            max-height:80vh;
+                        "
+                    >
+                        <source
+                        src="/stream/{msg.id}"
+                        type="video/mp4">
+                    </video>
 
-        <div style="
-        background:#222;
-        padding:15px;
-        margin:10px;
-        border-radius:10px">
+                    </div>
+                    """
 
-        <h3>{serial['title']}</h3>
-
-        <video
-            width="100%"
-            controls
-            autoplay
-            playsinline
-            preload="auto"
-            style="border-radius:10px"
-        >
-            <source src="/stream/{serial['id']}" type="video/mp4">
-        </video>
-
-        </div>
-
-        """
-
-    html += "</body>"
+    html += "</body></html>"
 
     return html
