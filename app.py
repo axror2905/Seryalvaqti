@@ -129,7 +129,9 @@ def movies():
         padding:10px;
     ">
 
-    <h1 style="text-align:center">Kinolar</h1>
+    <h1 style="text-align:center">
+        Kinolar
+    </h1>
     """
 
     for msg in messages:
@@ -149,9 +151,7 @@ def movies():
                         border-radius:15px;
                     ">
 
-                    <h3 style="
-                        margin-bottom:10px;
-                    ">
+                    <h3 style="margin-bottom:10px">
                         {msg.message or "Kino"}
                     </h3>
 
@@ -159,8 +159,11 @@ def movies():
                         width="100%"
                         controls
                         playsinline
+                        webkit-playsinline
                         preload="auto"
                         controlsList="nodownload"
+                        x5-video-player-type="h5"
+                        x5-video-player-fullscreen="true"
                         style="
                             border-radius:12px;
                             background:black;
@@ -205,7 +208,9 @@ def serials():
         padding:10px;
     ">
 
-    <h1 style="text-align:center">Seriallar</h1>
+    <h1 style="text-align:center">
+        Seriallar
+    </h1>
     """
 
     for msg in messages:
@@ -225,9 +230,7 @@ def serials():
                         border-radius:15px;
                     ">
 
-                    <h3 style="
-                        margin-bottom:10px;
-                    ">
+                    <h3 style="margin-bottom:10px">
                         {msg.message or "Serial"}
                     </h3>
 
@@ -235,8 +238,11 @@ def serials():
                         width="100%"
                         controls
                         playsinline
+                        webkit-playsinline
                         preload="auto"
                         controlsList="nodownload"
+                        x5-video-player-type="h5"
+                        x5-video-player-fullscreen="true"
                         style="
                             border-radius:12px;
                             background:black;
